@@ -1,10 +1,14 @@
-from aiogram.types import (ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton)
-main = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Каталог')],
-                                     [KeyboardButton(text='Корзина')],
-                                     [KeyboardButton(text='Контакты')]],
+from aiogram.types import (ReplyKeyboardMarkup, KeyboardButton,
+                           InlineKeyboardMarkup, InlineKeyboardButton)
+
+
+main = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Меню функций')],
+                                     [KeyboardButton(text='О боте PasswordHelper')],
+                                     [KeyboardButton(text='Перезапустить')]],
                            resize_keyboard=True,
-                           input_field_placeholder='Выберите пункт меню...')
-catalog = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text='футболка', callback_data='t-shirt')],
-    [InlineKeyboardButton(text='кепка', callback_data='cap')],
-    [InlineKeyboardButton(text='джинсы', callback_data='jeans')]])
+                           input_field_placeholder='Выберите пунтк меню...')
+
+menu = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text='Генератор паролей', callback_data='password')],
+    [InlineKeyboardButton(text='Проверить пароль на надежность', callback_data='check')],
+    [InlineKeyboardButton(text='Как выбрать пароль?', callback_data='advices')]])

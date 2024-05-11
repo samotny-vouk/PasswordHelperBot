@@ -4,55 +4,70 @@ from aiogram.filters import CommandStart, Command
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 import keyboard as kb
+from functions import password, check_password
+
+
+f_start = open('start_message.txt', encoding='utf-8')
+f_about = open('about.txt', encoding='utf-8')
+f_adv = open('advices.txt', encoding='utf-8')
+
+start_msg = f_start.read()
+about = f_about.read()
+adv = f_adv.read()
+
+users_password = State()
+
 router = Router()
 
-class Register(StatesGroup):
-    name = State()
-    age = State()
-    number = State()
 
 @router.message(CommandStart())
 async def cmd_start(message: Message):
-    await message.answer('Привет!', reply_markup=kb.main )
-    await message.reply('Как дела?')
+    await message.answer(start_msg, reply_markup=kb.main )
 
-@router.message(Command('help'))
+@router.message(F.text == 'Перезапустить')
+async def cmd_start(message: Message):
+    await message.answer(start_msg, reply_markup=kb.main )
+
+
+@router.message(Command('about'))
 async def cmd_help(message: Message):
-    await message.answer("помощь")
+    await message.answer(about)
 
-@router.message(F.text == 'Каталог')
+@router.message(F.text == 'О боте PasswordHelper')
 async def cmd_help(message: Message):
-    await message.answer("выберите категорию товара", reply_markup=kb.catalog)
+    await message.answer(about)
 
-@router.callback_query(F.data == 't-shirt')
+
+@router.message(Command('menu'))
+async def cmd_help(message: Message):
+    await message.answer("Выберите функцию", reply_markup=kb.menu)
+
+@router.message(F.text == 'Меню функций')
+async def cmd_help(message: Message):
+    await message.answer("Выберите функцию", reply_markup=kb.menu)
+
+
+@router.callback_query(F.data == 'password')
 async def t_shirt(callback: CallbackQuery):
-    await callback.answer('Вы выбрали категорию', show_alert=True)
-    await callback.message.answer('Вы выбрали категорию футболки')
+    await callback.message.answer('Ваш пароль готов: ' + password())
 
-@router.callback_query(F.data == 'jeans')
+
+@router.callback_query(F.data == 'check')
+async def t_shirt(callback: CallbackQuery, state: FSMContext):
+    await state.set_state(users_password)
+    await callback.message.answer('Введите ваш пароль')
+
+@router.message(users_password)
+async def register(message: Message, state: FSMContext):
+    await state.update_data(users_password=message.text)
+    await message.answer(check_password(message.text))
+
+
+@router.callback_query(F.data == 'advices')
 async def t_shirt(callback: CallbackQuery):
-    await callback.answer('Вы выбрали категорию')
-    await callback.message.answer('Вы выбрали категорию джинсы')
+    await callback.message.answer(adv)
 
-@router.message(Command('register'))
-async def register(message: Message, state: FSMContext):
-    await state.set_state(Register.name)
-    await message.answer('Введите ваше имя')
 
-@router.message(Register.name)
-async def register(message: Message, state: FSMContext):
-    await state.update_data(name=message.text)
-    await state.set_state(Register.age)
-    await message.answer('Введите ваш возраст')
-
-@router.message(Register.age)
-async def register(message: Message, state: FSMContext):
-    await state.update_data(age=message.text)
-    await state.set_state(Register.number)
-    await message.answer('Введите ваш номер телефона')
-
-@router.message(Register.number)
-async def register(message: Message, state: FSMContext):
-    await state.update_data(number=message.text)
-    data = await state.get_data()
-    await state.clear()
+f_start.close()
+f_about.close()
+f_adv.close()
